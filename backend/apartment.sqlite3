@@ -1,0 +1,90 @@
+-- Destroy all tables
+DROP TABLE IF EXISTS Apartment;
+DROP TABLE IF EXISTS Room;
+DROP TABLE IF EXISTS Bill;
+DROP TABLE IF EXISTS Device;
+DROP TABLE IF EXISTS DeviceType;
+DROP TABLE IF EXISTS RecordedData;
+
+-- Table for apartments
+CREATE TABLE Apartment (
+    apartment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    address VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(15),
+    ip_address VARCHAR(45),
+    insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for rooms in each apartment
+CREATE TABLE Room (
+    room_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    apartment_id INT REFERENCES Apartment(apartment_id) ON DELETE CASCADE,
+    x_coordinate INT,
+    y_coordinate INT,
+    z_coordinate INT
+);
+
+-- Table for types of sensors/actuators
+CREATE TABLE DeviceType (
+    type_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type_name VARCHAR(50) NOT NULL,
+    unit_of_measure VARCHAR(20),
+    precision_range VARCHAR(50) -- example format: '±0.5°C'
+);
+
+-- Table for sensors/actuators in each room
+CREATE TABLE Device (
+    device_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    room_id INT REFERENCES Room(room_id) ON DELETE CASCADE,
+    type_id INT REFERENCES DeviceType(type_id) ON DELETE SET NULL,
+    commercial_reference VARCHAR(100),
+    communication_port VARCHAR(50),
+    insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for measurements associated with each device
+CREATE TABLE RecordedData (
+    measurement_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id INT REFERENCES Device(device_id) ON DELETE CASCADE,
+    value DECIMAL(10, 2),
+    measurement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table for bills associated with an apartment
+CREATE TABLE Bill (
+    bill_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    apartment_id INT REFERENCES Apartment(apartment_id) ON DELETE CASCADE,
+    type VARCHAR(50) CHECK (type IN ('water', 'electricity', 'waste', 'other')), 
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    amount DECIMAL(10, 2),
+    consumed_value DECIMAL(10, 2)
+);
+
+-- Insert a new apartment
+INSERT INTO Apartment (address, phone_number, ip_address) VALUES ('123 Main St', '123-456-7890', '192.168.1.1');
+
+-- Insert 4 rooms for the newly created apartment using subqueries to get the last inserted apartment_id
+INSERT INTO Room (apartment_id, x_coordinate, y_coordinate, z_coordinate) VALUES ((SELECT last_insert_rowid()), 0, 0, 0);
+INSERT INTO Room (apartment_id, x_coordinate, y_coordinate, z_coordinate) VALUES ((SELECT last_insert_rowid()), 1, 0, 0);
+INSERT INTO Room (apartment_id, x_coordinate, y_coordinate, z_coordinate) VALUES ((SELECT last_insert_rowid()), 0, 1, 0);
+INSERT INTO Room (apartment_id, x_coordinate, y_coordinate, z_coordinate) VALUES ((SELECT last_insert_rowid()), 0, 0, 1);
+
+-- Insert 4 device types
+INSERT INTO DeviceType (type_name, unit_of_measure, precision_range) VALUES ('Temperature Sensor', '°C', '±0.5°C');
+INSERT INTO DeviceType (type_name, unit_of_measure, precision_range) VALUES ('Humidity Sensor', '%', '±2%');
+INSERT INTO DeviceType (type_name, unit_of_measure, precision_range) VALUES ('Motion Sensor', 'boolean', NULL);
+INSERT INTO DeviceType (type_name, unit_of_measure, precision_range) VALUES ('Light Sensor', 'lux', '±5%');
+
+-- Insert 2 devices for the first room
+INSERT INTO Device (room_id, type_id, commercial_reference, communication_port) VALUES (1, 1, 'TempSensor-001', 'COM1');
+INSERT INTO Device (room_id, type_id, commercial_reference, communication_port) VALUES (1, 2, 'HumiditySensor-001', 'COM2');
+
+-- Insert 2 records of measurements for the first device
+INSERT INTO RecordedData (device_id, value) VALUES (1, 22.5);
+INSERT INTO RecordedData (device_id, value) VALUES (1, 23.0);
+
+-- Insert 4 bills for the apartment
+INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'water', 50.00, 30.00);
+INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'electricity', 75.00, 50.00);
+INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'waste', 20.00, 15.00);
+INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'other', 100.00, 80.00);
