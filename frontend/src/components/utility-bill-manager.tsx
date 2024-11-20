@@ -1,6 +1,7 @@
 "'use client'";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -29,43 +30,68 @@ interface UtilityBill {
 }
 
 const utilityTypes = [
-  "'Electricity'",
-  "'Water'",
-  "'Gas'",
-  "'Internet'",
-  "'Waste Management'",
+  "Electricity",
+  "Water",
+  "Gas",
+  "Internet",
+  "Waste Management",
 ];
 const months = [
-  "'January'",
-  "'February'",
-  "'March'",
-  "'April'",
-  "'May'",
-  "'June'",
-  "'July'",
-  "'August'",
-  "'September'",
-  "'October'",
-  "'November'",
-  "'December'",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 export function UtilityBillManagerComponent() {
   const [bills, setBills] = useState<UtilityBill[]>([]);
   const [newBill, setNewBill] = useState<Partial<UtilityBill>>({});
 
-  const addBill = () => {
+  useEffect(() => {
+    fetchBills();
+  }, []);
+
+  const addBill = async () => {
     if (newBill.type && newBill.month && newBill.amount) {
-      setBills([
-        ...bills,
-        { ...newBill, id: Date.now().toString() } as UtilityBill,
-      ]);
-      setNewBill({});
+      try {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/add_bill`, {
+          apartment_id: 1,
+          bill_type: newBill.type,
+          amount: newBill.amount,
+          date: newBill.month,
+        });
+        setBills((prevBills) => [
+          ...prevBills,
+          { ...newBill, id: Date.now().toString() } as UtilityBill,
+        ]);
+        setNewBill({});
+      } catch (error) {
+        console.error("Error adding bill:", error);
+      }
+    }
+  };
+
+  const fetchBills = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/bills`
+      );
+      setBills(response.data);
+    } catch (error) {
+      console.error("Error fetching bills:", error);
     }
   };
 
   const deleteBill = (id: string) => {
-    setBills(bills.filter((bill) => bill.id !== id));
+    setBills((prevBills) => prevBills.filter((bill) => bill.id !== id));
   };
 
   return (
@@ -85,8 +111,8 @@ export function UtilityBillManagerComponent() {
               <SelectValue placeholder="Select utility type" />
             </SelectTrigger>
             <SelectContent>
-              {utilityTypes.map((type) => (
-                <SelectItem key={type} value={type}>
+              {utilityTypes.map((type, index) => (
+                <SelectItem key={index} value={type}>
                   {type}
                 </SelectItem>
               ))}
@@ -100,8 +126,8 @@ export function UtilityBillManagerComponent() {
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
             <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month} value={month}>
+              {months.map((month, index) => (
+                <SelectItem key={index} value={month}>
                   {month}
                 </SelectItem>
               ))}
@@ -110,7 +136,7 @@ export function UtilityBillManagerComponent() {
           <Input
             type="number"
             placeholder="Amount"
-            value={newBill.amount || "''"}
+            value={newBill.amount || ""}
             onChange={(e) =>
               setNewBill({ ...newBill, amount: parseFloat(e.target.value) })
             }
@@ -122,35 +148,45 @@ export function UtilityBillManagerComponent() {
             Add Bill
           </Button>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Month</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {bills.map((bill) => (
-              <TableRow key={bill.id}>
-                <TableCell>{bill.type}</TableCell>
-                <TableCell>{bill.month}</TableCell>
-                <TableCell>${bill.amount.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteBill(bill.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
+        <div
+          className="overflow-y-auto h-72 w-full"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Month</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {bills.map((bill) => (
+                <TableRow key={bill.id}>
+                  <TableCell>{bill.type}</TableCell>
+                  <TableCell>{bill.month}</TableCell>
+                  <TableCell>${bill.amount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteBill(bill.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

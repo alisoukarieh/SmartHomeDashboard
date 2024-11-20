@@ -34,12 +34,12 @@ export function Page2({ isEditing, isLargeScreen }: Page1Props) {
 
   return (
     <div className="px-4 md:px-12">
-      <div className="grid-stack bg-white dark:bg-neutral-900 shadow-lg backdrop-blur-md bg-opacity-70 dark:bg-opacity-70 rounded-lg ">
+      <div className="grid-stack bg-white dark:bg-neutral-900 shadow-lg backdrop-blur-md bg-opacity-70 dark:bg-opacity-70 rounded-lg w-full ">
         <div className="p-4 flex flex-col md:flex-row gap-4">
-          <div className="w-full md:w-3/4">
+          <div className="w-full md:w-4/6">
             <Barchart />
           </div>
-          <div className="w-full md:w-1/4">
+          <div className="w-full md:w-2/6">
             <UtilityBillManagerComponent />
           </div>
         </div>

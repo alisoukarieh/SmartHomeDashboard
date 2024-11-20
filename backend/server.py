@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 import sqlite3, random
 from datetime import datetime, timedelta
@@ -23,75 +23,22 @@ def disconnect_db(conn):
     conn.commit()
     conn.close()
 
-# http://127.0.0.1:8000/add_bill?apartment_id=1&bill_type=water&amount=200&consumed_value=200
 @app.post("/add_bill")
-def add_bill(apartment_id, bill_type, amount, consumed_value):
+async def add_bill(request: Request):
+    data = await request.json()
+    apartment_id = data.get("apartment_id")
+    bill_type = data.get("bill_type")
+    amount = data.get("amount")
+    month = data.get("date")
+    
+    # Convert month to a proper date structure (assuming the year is the current year)
+    date = f"{month} 01, {datetime.now().year}"
+    
     db, conn = connect_db()
-    db.execute("INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (?, ?, ?, ?);", (apartment_id, bill_type, amount, consumed_value))
+    db.execute("INSERT INTO Bill (apartment_id, type, amount, consumed_value, date) VALUES (?, ?, ?, ?, ?);", 
+               (apartment_id, bill_type, amount, amount, date))
     disconnect_db(conn)
-
-@app.get("/chart", response_class=HTMLResponse)
-def show_chart():
-    db, conn = connect_db()
-    db.execute("SELECT * FROM Bill;")
-    rows = db.fetchall()
-    data = {}
-    for row in rows:
-        bill_type = row['type']
-        amount = row['amount']
-        if bill_type in data:
-            data[bill_type] += amount
-        else:
-            data[bill_type] = amount
-    disconnect_db(conn)
-    html_content = f"""
-    <html>
-    <head>
-        <!--Load the AJAX API-->
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-
-        // Load the Visualization API and the corechart package.
-        google.charts.load('current', {{'packages':['corechart']}});
-
-        // Set a callback to run when the Google Visualization API is loaded.
-        google.charts.setOnLoadCallback(drawChart);
-
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
-        function drawChart() {{
-
-            // Create the data table.
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Type');
-            data.addColumn('number', 'Amount');
-            data.addRows([
-            ['Water', {data["water"]}],
-            ['Electricity', {data["electricity"]}],
-            ['Waste', {data["waste"]}],
-            ['Other', {data["other"]}]
-            ]);
-
-            // Set chart options
-            var options = {{'title':'Home bills',
-                        'width':400,
-                        'height':300}};
-
-            // Instantiate and draw our chart, passing in some options.
-            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-            chart.draw(data, options);
-        }}
-        </script>
-    </head>
-
-    <body>
-        <!--Div that will hold the pie chart-->
-        <div id="chart_div"></div>
-    </body>
-    </html>
-    """
-    return html_content
+    return {"status": "success"}
 
 @app.get("/last_month_utilities")
 def get_last_month_utilities():
@@ -104,7 +51,7 @@ def get_last_month_utilities():
         GROUP BY type
     """, (one_month_ago,))
     rows = db.fetchall()
-    data = {"water": 0, "electricity": 0, "wifi": 0}
+    data = {"Water": 0, "Electricity": 0, "Wifi": 0}
     for row in rows:
         bill_type = row['type']
         total_amount = row['total_amount']
@@ -113,3 +60,12 @@ def get_last_month_utilities():
 
     disconnect_db(conn)
     return JSONResponse(content=data)
+
+@app.get("/bills")
+async def get_bills():
+    db, conn = connect_db()
+    db.execute("SELECT * FROM Bill")
+    rows = db.fetchall()
+    bills = [dict(row) for row in rows]
+    disconnect_db(conn)
+    return JSONResponse(content=bills)
