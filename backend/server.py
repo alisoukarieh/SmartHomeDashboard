@@ -1,8 +1,17 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 import sqlite3, random
-
+from datetime import datetime, timedelta
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 def connect_db():
     conn = sqlite3.connect('apartment.db')
@@ -83,3 +92,24 @@ def show_chart():
     </html>
     """
     return html_content
+
+@app.get("/last_month_utilities")
+def get_last_month_utilities():
+    db, conn = connect_db()
+    one_month_ago = datetime.now() - timedelta(days=30)
+    db.execute("""
+        SELECT type, SUM(amount) as total_amount
+        FROM Bill
+        WHERE date >= ?
+        GROUP BY type
+    """, (one_month_ago,))
+    rows = db.fetchall()
+    data = {"water": 0, "electricity": 0, "wifi": 0}
+    for row in rows:
+        bill_type = row['type']
+        total_amount = row['total_amount']
+        if bill_type in data:
+            data[bill_type] = total_amount
+
+    disconnect_db(conn)
+    return JSONResponse(content=data)

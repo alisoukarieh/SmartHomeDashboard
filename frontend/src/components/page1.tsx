@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 import "gridstack/dist/gridstack.min.css";
@@ -18,6 +19,28 @@ interface Page1Props {
 }
 
 export function Page1({ isEditing, isLargeScreen }: Page1Props) {
+  const [utilitiesData, setUtilitiesData] = useState({
+    water: 0,
+    electricity: 0,
+    wifi: 0,
+  });
+
+  const fetchUtilitiesData = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/last_month_utilities`
+      );
+      setUtilitiesData(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching utilities data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUtilitiesData();
+  }, []);
+
   useEffect(() => {
     if (isLargeScreen) {
       const grid = GridStack.init({
@@ -56,7 +79,11 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
             gs-y="0"
           >
             <div className="grid-stack-item-content">
-              <UtilitiesPieChart />
+              <UtilitiesPieChart
+                water={utilitiesData.water}
+                electricity={utilitiesData.electricity}
+                wifi={utilitiesData.wifi}
+              />
             </div>
           </div>
           <div

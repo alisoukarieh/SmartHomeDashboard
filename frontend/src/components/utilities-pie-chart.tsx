@@ -14,17 +14,27 @@ import {
 } from "chart.js";
 import { FC } from "react";
 
+interface UtilitiesPieChartProps {
+  water: number;
+  electricity: number;
+  wifi: number;
+}
+
 // Register necessary Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-const UtilitiesPieChart: FC = () => {
+const UtilitiesPieChart: FC<UtilitiesPieChartProps> = ({
+  water,
+  electricity,
+  wifi,
+}) => {
   // Define the data for the pie chart with proper TypeScript typing
   const data: ChartData<"pie", number[], string> = {
     labels: ["Electricity", "Wifi", "Water"],
     datasets: [
       {
         label: "Colors",
-        data: [300, 50, 100],
+        data: [electricity, wifi, water],
         backgroundColor: [
           "rgba(255, 99, 132, 1)",
           "rgba(54, 162, 235, 1)",
