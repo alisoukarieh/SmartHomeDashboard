@@ -57,6 +57,7 @@ def get_last_month_utilities():
         total_amount = row['total_amount']
         if bill_type in data:
             data[bill_type] = total_amount
+    print(data)
 
     disconnect_db(conn)
     return JSONResponse(content=data)

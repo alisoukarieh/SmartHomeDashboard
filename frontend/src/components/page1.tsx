@@ -20,9 +20,9 @@ interface Page1Props {
 
 export function Page1({ isEditing, isLargeScreen }: Page1Props) {
   const [utilitiesData, setUtilitiesData] = useState({
-    water: 0,
-    electricity: 0,
-    wifi: 0,
+    Water: 0,
+    Electricity: 0,
+    Wifi: 0,
   });
 
   const fetchUtilitiesData = async () => {
@@ -80,9 +80,9 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
           >
             <div className="grid-stack-item-content">
               <UtilitiesPieChart
-                water={utilitiesData.water}
-                electricity={utilitiesData.electricity}
-                wifi={utilitiesData.wifi}
+                water={utilitiesData.Water}
+                electricity={utilitiesData.Electricity}
+                wifi={utilitiesData.Wifi}
               />
             </div>
           </div>
