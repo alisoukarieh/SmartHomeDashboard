@@ -14,7 +14,8 @@ import {
   ChartData,
   ChartOptions,
 } from "chart.js";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
+import axios from "axios";
 
 // Register the necessary Chart.js components
 ChartJS.register(
@@ -27,8 +28,24 @@ ChartJS.register(
 );
 
 const BarChart: FC = () => {
-  // Define the data for each month
-  const data: ChartData<"bar", number[], string> = {
+  const [data, setData] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchMonthlyData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/monthly_utilities`
+        );
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching monthly data:", error);
+      }
+    };
+
+    fetchMonthlyData();
+  }, []);
+
+  const chartData: ChartData<"bar", number[], string> = {
     labels: [
       "January",
       "February",
@@ -46,7 +63,7 @@ const BarChart: FC = () => {
     datasets: [
       {
         label: "Monthly Sales",
-        data: [300, 500, 400, 600, 700, 550, 800, 750, 650, 900, 850, 950],
+        data: data,
         backgroundColor: "rgba(29, 64, 175, 1)",
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 1,
@@ -100,7 +117,7 @@ const BarChart: FC = () => {
 
   return (
     <div className="w-full p-4 bg-gradient-to-br from-blue-50 to-blue-100 h-full rounded-lg">
-      <Bar data={data} options={options} />
+      <Bar data={chartData} options={options} />
     </div>
   );
 };

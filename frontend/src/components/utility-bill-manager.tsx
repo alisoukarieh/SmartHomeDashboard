@@ -167,8 +167,8 @@ export function UtilityBillManagerComponent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bills.map((bill) => (
-                <TableRow key={bill.id}>
+              {bills.map((bill, index) => (
+                <TableRow key={index}>
                   <TableCell>{bill.type}</TableCell>
                   <TableCell>{bill.month}</TableCell>
                   <TableCell>${bill.amount.toFixed(2)}</TableCell>

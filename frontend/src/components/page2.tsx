@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 import "gridstack/dist/gridstack.min.css";
 import { GridStack } from "gridstack";
@@ -30,7 +31,7 @@ export function Page2({ isEditing, isLargeScreen }: Page1Props) {
         staticGrid: !isEditing,
       });
     }
-  }, []);
+  }, [isLargeScreen, isEditing]);
 
   return (
     <div className="px-4 md:px-12">

@@ -70,3 +70,25 @@ async def get_bills():
     bills = [dict(row) for row in rows]
     disconnect_db(conn)
     return JSONResponse(content=bills)
+
+@app.get("/monthly_utilities")
+def get_monthly_utilities():
+    db, conn = connect_db()
+    db.execute("""
+        SELECT strftime('%m', date) as month, SUM(amount) as total_amount
+        FROM Bill
+        GROUP BY strftime('%Y-%m', date)
+        ORDER BY strftime('%Y-%m', date)
+    """)
+    rows = db.fetchall()
+    monthly_data = [0] * 12
+    for row in rows:
+        month = row['month']
+        if month is not None:
+            month = int(month) - 1
+            total_amount = row['total_amount']
+            monthly_data[month] = total_amount
+
+    print(monthly_data)
+    disconnect_db(conn)
+    return JSONResponse(content=monthly_data)
