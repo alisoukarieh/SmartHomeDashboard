@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 import sqlite3, random
 from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 app.add_middleware(

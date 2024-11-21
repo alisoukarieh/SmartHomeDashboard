@@ -20,6 +20,22 @@ params = {
 }
 responses = openmeteo.weather_api(url, params=params)
 
+def get_current_weather(latitude, longitude):
+    params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "current_weather": True
+    }
+    response = openmeteo.weather_api(url, params=params)[0]
+    current_weather = response.CurrentWeather()
+    return {
+        "location": f"{latitude}, {longitude}",
+        "temperature": current_weather.Temperature(),
+        "condition": current_weather.WeatherCode(),
+        "humidity": current_weather.RelativeHumidity(),
+        "windSpeed": current_weather.WindSpeed()
+    }
+
 # Process first location. Add a for-loop for multiple locations or weather models
 response = responses[0]
 print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
