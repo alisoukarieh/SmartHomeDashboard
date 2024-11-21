@@ -37,7 +37,7 @@ const utilityTypes = [
   "Electricity",
   "Water",
   "Gas",
-  "Internet",
+  "Wifi",
   "Waste Management",
 ];
 const months = [

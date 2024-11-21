@@ -18,8 +18,10 @@ const BillsList: React.FC<BillsListProps> = ({ bills }) => {
   };
 
   return (
-    <div className="p-4 h-[40rem] bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-blue-800  ">Bills History</h2>
+    <div className="p-4 h-[40rem] bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+      <h2 className="text-2xl font-bold mb-4 text-green-800  ">
+        Bills History
+      </h2>
       <div className="overflow-x-auto bg-white rounded-lg py-2">
         <table className="min-w-full border-collapse">
           <thead>

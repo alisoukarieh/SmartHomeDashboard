@@ -54,7 +54,7 @@ CREATE TABLE RecordedData (
 CREATE TABLE Bill (
     bill_id INTEGER PRIMARY KEY AUTOINCREMENT,
     apartment_id INT REFERENCES Apartment(apartment_id) ON DELETE CASCADE,
-    type VARCHAR(50) CHECK (type IN ('Water', 'Electricity', 'waste', 'Internet', 'Gas', 'Waste Management')), 
+    type VARCHAR(50) CHECK (type IN ('Water', 'Electricity', 'Wifi', 'Gas', 'Waste Management')), 
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     amount DECIMAL(10, 2),
     consumed_value DECIMAL(10, 2)
@@ -87,4 +87,4 @@ INSERT INTO RecordedData (device_id, value) VALUES (1, 23.0);
 INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'Water', 50.00, 30.00);
 INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'Electricity', 75.00, 50.00);
 INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'Waste Management', 20.00, 15.00);
-INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'Internet', 100.00, 80.00);
+INSERT INTO Bill (apartment_id, type, amount, consumed_value) VALUES (1, 'Wifi', 100.00, 80.00);

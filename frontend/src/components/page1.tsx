@@ -78,13 +78,7 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
             gs-x="0"
             gs-y="0"
           >
-            <div className="grid-stack-item-content">
-              <UtilitiesPieChart
-                water={utilitiesData.Water}
-                electricity={utilitiesData.Electricity}
-                wifi={utilitiesData.Wifi}
-              />
-            </div>
+            <div className="grid-stack-item-content"></div>
           </div>
           <div
             className="grid-stack-item border-dark"

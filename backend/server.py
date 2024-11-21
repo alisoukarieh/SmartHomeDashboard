@@ -48,7 +48,7 @@ def get_last_month_utilities():
         GROUP BY type
     """, (one_month_ago,))
     rows = db.fetchall()
-    data = {"Water": 0, "Electricity": 0, "Wifi": 0}
+    data = {"Water": 0, "Electricity": 0, "Wifi": 0, "Gas": 0, "Waste Management": 0}
     for row in rows:
         bill_type = row['type']
         total_amount = row['total_amount']
@@ -92,3 +92,18 @@ def get_monthly_utilities():
     print(monthly_data)
     disconnect_db(conn)
     return JSONResponse(content=monthly_data)
+
+@app.get("/recorded_data")
+async def get_recorded_data():
+    db, conn = connect_db()
+    db.execute("""
+        SELECT r.room_id, dt.type_name, rd.value, dt.unit_of_measure, rd.measurement_date
+        FROM RecordedData rd
+        JOIN Device d ON rd.device_id = d.device_id
+        JOIN Room r ON d.room_id = r.room_id
+        JOIN DeviceType dt ON d.type_id = dt.type_id
+    """)
+    rows = db.fetchall()
+    recorded_data = [f"Room ID: {row['room_id']}, Type: {row['type_name']}, Value: {row['value']} {row['unit_of_measure']}, Date: {row['measurement_date']}" for row in rows]
+    disconnect_db(conn)
+    return JSONResponse(content=recorded_data)
