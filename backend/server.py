@@ -29,10 +29,7 @@ async def add_bill(request: Request):
     apartment_id = data.get("apartment_id")
     bill_type = data.get("bill_type")
     amount = data.get("amount")
-    month = data.get("date")
-    
-    # Convert month to a proper date structure (assuming the year is the current year)
-    date = f"{month} 01, {datetime.now().year}"
+    date = data.get("date")
     
     db, conn = connect_db()
     db.execute("INSERT INTO Bill (apartment_id, type, amount, consumed_value, date) VALUES (?, ?, ?, ?, ?);", 
@@ -68,6 +65,9 @@ async def get_bills():
     db.execute("SELECT * FROM Bill")
     rows = db.fetchall()
     bills = [dict(row) for row in rows]
+    for bill in bills:
+        bill_date = datetime.strptime(bill['date'], "%B %Y")
+        bill['date'] = bill_date.strftime("%B %Y")
     disconnect_db(conn)
     return JSONResponse(content=bills)
 

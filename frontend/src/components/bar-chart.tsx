@@ -30,18 +30,18 @@ ChartJS.register(
 const BarChart: FC = () => {
   const [data, setData] = useState<number[]>([]);
 
-  useEffect(() => {
-    const fetchMonthlyData = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/monthly_utilities`
-        );
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching monthly data:", error);
-      }
-    };
+  const fetchMonthlyData = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/monthly_utilities`
+      );
+      setData(response.data);
+    } catch (error) {
+      console.error("Error fetching monthly data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchMonthlyData();
   }, []);
 

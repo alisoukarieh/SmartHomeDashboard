@@ -29,6 +29,10 @@ interface UtilityBill {
   amount: number;
 }
 
+interface UtilityBillManagerComponentProps {
+  fetchBills: () => void;
+}
+
 const utilityTypes = [
   "Electricity",
   "Water",
@@ -51,7 +55,9 @@ const months = [
   "December",
 ];
 
-export function UtilityBillManagerComponent() {
+export function UtilityBillManagerComponent({
+  fetchBills,
+}: UtilityBillManagerComponentProps) {
   const [bills, setBills] = useState<UtilityBill[]>([]);
   const [newBill, setNewBill] = useState<Partial<UtilityBill>>({});
 
@@ -62,16 +68,14 @@ export function UtilityBillManagerComponent() {
   const addBill = async () => {
     if (newBill.type && newBill.month && newBill.amount) {
       try {
+        const currentYear = new Date().getFullYear();
         await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/add_bill`, {
           apartment_id: 1,
           bill_type: newBill.type,
           amount: newBill.amount,
-          date: newBill.month,
+          date: `${newBill.month} ${currentYear}`,
         });
-        setBills((prevBills) => [
-          ...prevBills,
-          { ...newBill, id: Date.now().toString() } as UtilityBill,
-        ]);
+        fetchBills(); // Fetch updated bills from the backend
         setNewBill({});
       } catch (error) {
         console.error("Error adding bill:", error);
@@ -79,7 +83,7 @@ export function UtilityBillManagerComponent() {
     }
   };
 
-  const fetchBills = async () => {
+  const fetchAllBills = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/bills`
@@ -95,7 +99,7 @@ export function UtilityBillManagerComponent() {
   };
 
   return (
-    <Card className="w-full max-w-xl h-[40rem] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800">
+    <Card className="w-full max-w-xl h-[20rem] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-100">
           Utility Bill Manager
@@ -147,45 +151,6 @@ export function UtilityBillManagerComponent() {
           >
             Add Bill
           </Button>
-        </div>
-        <div
-          className="overflow-y-auto h-72 w-full"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <style jsx>{`
-            div::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Month</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bills.map((bill, index) => (
-                <TableRow key={index}>
-                  <TableCell>{bill.type}</TableCell>
-                  <TableCell>{bill.month}</TableCell>
-                  <TableCell>${bill.amount.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteBill(bill.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
         </div>
       </CardContent>
     </Card>
