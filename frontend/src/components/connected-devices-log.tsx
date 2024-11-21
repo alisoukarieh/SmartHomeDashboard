@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Thermometer, Fan, Eye, Activity, Zap } from "lucide-react";
+import axios from "axios";
 
 type DeviceType =
   | "'temperature'"
@@ -14,10 +15,7 @@ type DeviceType =
 
 interface DeviceLog {
   id: string;
-  name: string;
-  type: DeviceType;
-  value: string;
-  timestamp: string;
+  log: string;
 }
 
 const getDeviceIcon = (type: DeviceType) => {
@@ -51,69 +49,30 @@ const getDeviceColor = (type: DeviceType) => {
 };
 
 export function ConnectedDevicesLogComponent() {
-  const [deviceLogs, setDeviceLogs] = useState<DeviceLog[]>([]);
+  const [deviceLogs, setDeviceLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDeviceLogs = async () => {
-      try {
-        // Simulating API call with mock data
-        const response = await new Promise<DeviceLog[]>((resolve) =>
-          setTimeout(
-            () =>
-              resolve([
-                {
-                  id: "'1'",
-                  name: "'Living Room Sensor'",
-                  type: "'temperature'",
-                  value: "'22°C'",
-                  timestamp: "'2023-05-15 10:30:00'",
-                },
-                {
-                  id: "'2'",
-                  name: "'Garage Door'",
-                  type: "'motor'",
-                  value: "'Closed'",
-                  timestamp: "'2023-05-15 10:29:30'",
-                },
-                {
-                  id: "'3'",
-                  name: "'Backyard Camera'",
-                  type: "'motion'",
-                  value: "'No motion'",
-                  timestamp: "'2023-05-15 10:28:45'",
-                },
-                {
-                  id: "'4'",
-                  name: "'Solar Panel'",
-                  type: "'energy'",
-                  value: "'5.2 kWh'",
-                  timestamp: "'2023-05-15 10:28:00'",
-                },
-                {
-                  id: "'5'",
-                  name: "'Kitchen Sensor'",
-                  type: "'temperature'",
-                  value: "'24°C'",
-                  timestamp: "'2023-05-15 10:27:30'",
-                },
-              ]),
-            1000
-          )
-        );
-        setDeviceLogs(response);
-      } catch (error) {
-        console.error("'Error fetching device logs:'", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDeviceLogs = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/recorded_data`
+      );
+      setDeviceLogs(response.data);
+    } catch (error) {
+      console.error("Error fetching device logs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDeviceLogs();
+    const interval = setInterval(fetchDeviceLogs, 600000); // 10 minutes
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <Card className="w-full h-full  bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+    <Card className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">
           Connected Devices Log
@@ -126,20 +85,14 @@ export function ConnectedDevicesLogComponent() {
           </div>
         ) : (
           <ScrollArea className="h-64 w-full pr-4">
-            {deviceLogs.map((log) => (
-              <div key={log.id} className="mb-4 last:mb-0">
+            {deviceLogs.map((log, index) => (
+              <div key={index} className="mb-2 last:mb-0">
                 <div className="flex items-center space-x-2">
-                  <div
-                    className={`p-2 rounded-full ${getDeviceColor(log.type)}`}
-                  >
-                    {getDeviceIcon(log.type)}
-                  </div>
                   <div className="flex-grow">
-                    <h3 className="text-lg font-semibold">{log.name}</h3>
-                    <p className="text-sm opacity-80">{log.value}</p>
+                    <p className="text-md ">• {log}</p>
                   </div>
-                  <div className="text-xs opacity-60">{log.timestamp}</div>
                 </div>
+                <hr className="border-t border-gray-300 w-full" />
               </div>
             ))}
           </ScrollArea>

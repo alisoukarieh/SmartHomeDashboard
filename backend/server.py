@@ -54,8 +54,6 @@ def get_last_month_utilities():
         total_amount = row['total_amount']
         if bill_type in data:
             data[bill_type] = total_amount
-    print(data)
-
     disconnect_db(conn)
     return JSONResponse(content=data)
 
@@ -88,8 +86,6 @@ def get_monthly_utilities():
             month = int(month) - 1
             total_amount = row['total_amount']
             monthly_data[month] = total_amount
-
-    print(monthly_data)
     disconnect_db(conn)
     return JSONResponse(content=monthly_data)
 
@@ -104,6 +100,6 @@ async def get_recorded_data():
         JOIN DeviceType dt ON d.type_id = dt.type_id
     """)
     rows = db.fetchall()
-    recorded_data = [f"Room ID: {row['room_id']}, Type: {row['type_name']}, Value: {row['value']} {row['unit_of_measure']}, Date: {row['measurement_date']}" for row in rows]
+    recorded_data = [f"{row['type_name']} in Room {row['room_id']} recorded {row['value']} {row['unit_of_measure']} on {row['measurement_date']}" for row in rows]
     disconnect_db(conn)
     return JSONResponse(content=recorded_data)
