@@ -1,20 +1,46 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
+interface Stock {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+}
+
 export function StockPrices() {
-  const stocks = [
-    { symbol: "AAPL", name: "Apple Inc.", price: 150.23, change: 2.5 },
-    { symbol: "GOOGL", name: "Alphabet Inc.", price: 2750.01, change: -1.2 },
-    {
-      symbol: "MSFT",
-      name: "Microsoft Corporation",
-      price: 305.94,
-      change: 0.8,
-    },
-    { symbol: "AMZN", name: "Amazon.com, Inc.", price: 3380.05, change: -0.5 },
-    { symbol: "TSLA", name: "Tesla, Inc.", price: 689.3, change: 3.2 },
-  ];
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const symbols = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"];
+  const apiKey = "9GN2P4AVG5GB2ETT";
+
+  useEffect(() => {
+    async function fetchStockPrices() {
+      const stockDataPromises = symbols.map(async (symbol) => {
+        const response = await fetch(
+          `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`
+        );
+        const data = await response.json();
+        const timeSeries = data["Time Series (Daily)"];
+        const latestDate = Object.keys(timeSeries)[0];
+        const latestData = timeSeries[latestDate];
+        return {
+          symbol: symbol,
+          name: symbol, // Placeholder for name, as API does not provide it
+          price: parseFloat(latestData["4. close"]),
+          change:
+            parseFloat(latestData["4. close"]) -
+            parseFloat(latestData["1. open"]),
+        };
+      });
+
+      const stockData = await Promise.all(stockDataPromises);
+      setStocks(stockData);
+    }
+
+    fetchStockPrices();
+  }, []);
 
   return (
     <div className="bg-black text-white p-6 rounded-lg shadow-lg w-full h-full">

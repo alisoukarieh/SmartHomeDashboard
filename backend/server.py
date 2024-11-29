@@ -3,8 +3,10 @@ from fastapi.responses import HTMLResponse, JSONResponse
 import sqlite3, random
 from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 
 app = FastAPI()
+esp_ip = "192.168.1.21"
 
 app.add_middleware(
     CORSMiddleware,
@@ -101,6 +103,37 @@ async def get_recorded_data():
         JOIN DeviceType dt ON d.type_id = dt.type_id
     """)
     rows = db.fetchall()
-    recorded_data = [f"{row['type_name']} in Room {row['room_id']} recorded {row['value']} {row['unit_of_measure']} on {row['measurement_date']}" for row in rows]
+    recorded_data = []
+    for row in rows:
+        if row['type_name'] == 'Light Bulb':
+            status = "Turned On" if row['value'] == 1 else "Turned Off"
+            recorded_data.append(f"Light in Room {row['room_id']} {status} on {row['measurement_date']}")
+        else:
+            recorded_data.append(f"{row['type_name']} in Room {row['room_id']} recorded {row['value']} {row['unit_of_measure']} on {row['measurement_date']}")
     disconnect_db(conn)
     return JSONResponse(content=recorded_data)
+
+@app.get("/turn_on_light")
+async def turn_on_light():
+    url = f"http://{esp_ip}/LED_ON"
+    response = requests.get(url)
+    if response.status_code == 200:
+        db, conn = connect_db()
+        db.execute("INSERT INTO RecordedData (device_id, value) VALUES (?, ?)", (3, 1))  # Assuming device_id 1 is the light
+        disconnect_db(conn)
+        return {"status": "success"}
+    else:
+        return {"status": "failed"}
+
+@app.get("/turn_off_light")
+async def turn_off_light():
+    url = f"http://{esp_ip}/LED_OFF"
+    response = requests.get(url)
+    if response.status_code == 200:
+        db, conn = connect_db()
+        db.execute("INSERT INTO RecordedData (device_id, value) VALUES (?, ?)", (3, 0))  # Assuming device_id 1 is the light
+        disconnect_db(conn)
+        return {"status": "success"}
+    else:
+        return {"status": "failed"}
+# curl -X GET "http://127.0.0.1:8000/turn_on_light"

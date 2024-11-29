@@ -3,12 +3,14 @@
 import { LightbulbIcon, LockIcon } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useState } from "react";
+import axios from "axios";
 
 interface StatusWidgetProps {
   icon: "light" | "lock";
   label: string;
   initialState?: boolean;
   onClick?: () => void;
+  id: string; // Add a unique identifier for each widget
 }
 
 function StatusWidget({
@@ -16,13 +18,28 @@ function StatusWidget({
   label,
   initialState = false,
   onClick,
+  id, // Destructure the id prop
 }: StatusWidgetProps) {
   const [isActive, setIsActive] = useState(initialState);
   const IconComponent = icon === "light" ? LightbulbIcon : LockIcon;
 
-  const handleClick = () => {
-    setIsActive(!isActive);
-    onClick?.();
+  const handleClick = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (id === "living-room") {
+        if (icon === "light") {
+          if (isActive) {
+            await axios.get(`${apiUrl}/turn_off_light`);
+          } else {
+            await axios.get(`${apiUrl}/turn_on_light`);
+          }
+        }
+      }
+      setIsActive(!isActive);
+      onClick?.();
+    } catch (error) {
+      console.error(`Error toggling ${icon}:`, error);
+    }
   };
 
   const getColor = () => {
@@ -64,10 +81,30 @@ export function StatusWidgetsComponent() {
       </CardHeader>
       <CardContent>
         <div className="flex justify-between space-x-4">
-          <StatusWidget icon="light" label="Living Room" initialState={true} />
-          <StatusWidget icon="light" label="Kitchen" initialState={false} />
-          <StatusWidget icon="light" label="Bedroom" initialState={true} />
-          <StatusWidget icon="lock" label="Front Door" initialState={false} />
+          <StatusWidget
+            id="living-room"
+            icon="light"
+            label="Living Room"
+            initialState={true}
+          />
+          <StatusWidget
+            id="kitchen"
+            icon="light"
+            label="Kitchen"
+            initialState={false}
+          />
+          <StatusWidget
+            id="bedroom"
+            icon="light"
+            label="Bedroom"
+            initialState={true}
+          />
+          <StatusWidget
+            id="front-door"
+            icon="lock"
+            label="Front Door"
+            initialState={false}
+          />
         </div>
       </CardContent>
     </Card>
