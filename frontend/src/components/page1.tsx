@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import "gridstack/dist/gridstack.min.css";
 import { GridStack } from "gridstack";
 import { StockPrices } from "@/components/stock-prices";
-import { TodoList } from "@/components/todo-list";
+import TodoList from "@/components/todo-list";
 import { CurrentWeather } from "@/components/current-weather";
 import HumidityGaugeComponent from "@/components/hum-gauge";
 import TemperatureGaugeComponent from "@/components/temp-gauge";
 import { ConnectedDevicesLogComponent } from "./connected-devices-log";
 import UtilitiesPieChart from "@/components/utilities-pie-chart";
+import PhotoFrame from "@/components/photo_frame";
 import { StatusWidgetsComponent } from "./status-widgets";
 
 interface Page1Props {
@@ -68,7 +69,7 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
             gs-no-resize="true"
           >
             <div className="grid-stack-item-content">
-              <StockPrices />
+              <PhotoFrame />
             </div>
           </div>
           <div
@@ -129,7 +130,7 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
           <div
             className="grid-stack-item border-dark"
             gs-w="4"
-            gs-h="2"
+            gs-h="6"
             gs-x="0"
             gs-y="3"
           >
@@ -141,14 +142,22 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
       ) : (
         // Simple stacked layout for smaller screens
         <div className="space-y-4 ">
-          <div className="border-dark">
-            <StockPrices />
-          </div>
-          <div className="border-dark">
-            <TodoList />
-          </div>
-          <div className="border-dark">
+          <div>
             <CurrentWeather />
+          </div>
+          <div className="border-dark flex flex-row mx-2 space-x-2">
+            <div className="w-1/2">
+              <TemperatureGaugeComponent />
+            </div>
+            <div className="w-1/2">
+              <HumidityGaugeComponent />
+            </div>
+          </div>
+          <div>
+            <ConnectedDevicesLogComponent />
+          </div>
+          <div>
+            <StatusWidgetsComponent />
           </div>
         </div>
       )}

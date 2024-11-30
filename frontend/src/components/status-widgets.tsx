@@ -75,12 +75,12 @@ function StatusWidget({
 
 export function StatusWidgetsComponent() {
   return (
-    <Card className="w-full h-full bg-white dark:bg-neutral-950">
+    <Card className="w-full h-full bg-white">
       <CardHeader>
         <h2 className="text-2xl font-semibold">Favorite Devices</h2>
       </CardHeader>
       <CardContent>
-        <div className="flex justify-between space-x-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatusWidget
             id="living-room"
             icon="light"

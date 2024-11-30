@@ -85,7 +85,7 @@ const HumGaugeComponent: FC = () => {
 
   return (
     <div className="w-full h-full bg-white rounded-lg flex flex-col items-center">
-      <div className="px-4 w-full">
+      <div className="px-4 w-full ">
         <Doughnut data={data} options={options} />
       </div>
       <div className="text-3xl font-bold ">{humidity}%</div>

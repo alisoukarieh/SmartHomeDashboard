@@ -103,6 +103,7 @@ async def get_recorded_data():
         JOIN DeviceType dt ON d.type_id = dt.type_id
     """)
     rows = db.fetchall()
+    rows = [dict(row) for row in rows][::-1]
     recorded_data = []
     for row in rows:
         if row['type_name'] == 'Light Bulb':

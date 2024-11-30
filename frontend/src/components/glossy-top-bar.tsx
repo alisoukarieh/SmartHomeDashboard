@@ -2,7 +2,7 @@
 
 export function GlossyTopBarComponent() {
   return (
-    <div className="px-12 py-8">
+    <div className="px-4 py-8 md:px-12 ">
       <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-neutral-900 shadow-lg backdrop-blur-md bg-opacity-70 dark:bg-opacity-70 rounded-lg">
         <div className="flex items-center px-4">
           <span className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
