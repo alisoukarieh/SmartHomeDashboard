@@ -26,6 +26,24 @@ void handleLEDOff() {
   server.send(200, "text/plain", "LED is OFF");
 }
 
+void handleTempHum() {
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  if (isnan(temperature) || isnan(humidity)) {
+    server.send(500, "application/json", "{\"error\": \"Failed to read from DHT sensor\"}");
+    return;
+  }
+
+  String jsonResponse = "{";
+  jsonResponse += "\"temperature\": " + String(temperature, 2) + ",";
+  jsonResponse += "\"humidity\": " + String(humidity, 2);
+  jsonResponse += "}";
+
+  server.send(200, "application/json", jsonResponse);
+}
+
+
 void setup() {
   Serial.begin(115200);
   dht.begin();
@@ -53,11 +71,12 @@ void setup() {
 
   server.on("/LED_ON", handleLEDOn);
   server.on("/LED_OFF", handleLEDOff);
+  server.on("/Temp_Hum", handleTempHum);
 
   server.begin();
-
 }
 
 void loop() {
   server.handleClient(); 
+
 }

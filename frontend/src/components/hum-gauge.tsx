@@ -10,24 +10,40 @@ import {
   ChartOptions,
 } from "chart.js";
 import { FC } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 ChartJS.register(ArcElement, Tooltip, Title);
 
-const HumidityGaugeComponent: FC = () => {
+const HumGaugeComponent: FC = () => {
   // Hardcoded temperature value (you'll replace this with fetched data later)
-  const temperature = 25;
+  const [humidity, setHumidity] = useState(0);
+
+  useEffect(() => {
+    const fetchTemperature = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/temp_hum`
+        );
+        setHumidity(response.data.humidity);
+      } catch (error) {
+        console.error("Error fetching temperature:", error);
+      }
+    };
+
+    fetchTemperature();
+    const interval = setInterval(fetchTemperature, 600000); // 10 minutes in milliseconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Function to determine color based on temperature
   const getTemperatureColor = (temp: number): string => {
-    if (temp <= 0) return "rgba(0, 0, 255, 1)"; // Cold (blue)
-    if (temp <= 15) return "rgba(0, 255, 255, 1)"; // Cool (cyan)
-    if (temp <= 25) return "rgba(0, 200, 100, 1)"; // Normal (green)
-    if (temp <= 35) return "rgba(255, 165, 0, 1)"; // Warm (orange)
-    return "rgba(255, 0, 0, 1)"; // Hot (red)
+    return "rgba(0, 150, 255, 1)"; // Cool (cyan)
   };
 
   // Calculate percentage for the gauge (assuming range -10 to 50°C)
-  const percentage = ((temperature + 10) / 60) * 100;
+  const percentage = humidity;
 
   const data: ChartData<"doughnut", number[], string> = {
     datasets: [
@@ -35,7 +51,7 @@ const HumidityGaugeComponent: FC = () => {
         label: "Temperature",
         data: [percentage, 100 - percentage],
         backgroundColor: [
-          getTemperatureColor(temperature),
+          getTemperatureColor(humidity),
           "rgba(200, 200, 200, 0.3)",
         ],
         borderWidth: 0,
@@ -53,7 +69,7 @@ const HumidityGaugeComponent: FC = () => {
       },
       title: {
         display: true,
-        text: "Temperature",
+        text: "Humidity",
         font: {
           size: 25,
         },
@@ -72,9 +88,9 @@ const HumidityGaugeComponent: FC = () => {
       <div className="px-4 w-full">
         <Doughnut data={data} options={options} />
       </div>
-      <div className="text-3xl font-bold ">{temperature}°C</div>
+      <div className="text-3xl font-bold ">{humidity}%</div>
     </div>
   );
 };
 
-export default HumidityGaugeComponent;
+export default HumGaugeComponent;

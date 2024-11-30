@@ -136,4 +136,17 @@ async def turn_off_light():
         return {"status": "success"}
     else:
         return {"status": "failed"}
+    
+@app.get("/temp_hum")
+async def get_temp_hum():
+    url = f"http://{esp_ip}/Temp_Hum"
+    response = requests.get(url)
+    if response.status_code == 200:
+        db, conn = connect_db()
+        db.execute("Insert into RecordedData (device_id, value) VALUES (?, ?)", (1, response.json()['temperature']))
+        db.execute("Insert into RecordedData (device_id, value) VALUES (?, ?)", (2, response.json()['humidity']))
+        disconnect_db(conn)
+        return response.json()
+    else:
+        return {"status": "failed"}
 # curl -X GET "http://127.0.0.1:8000/turn_on_light"
