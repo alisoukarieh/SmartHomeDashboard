@@ -72,9 +72,10 @@ const UtilitiesPieChart: FC<UtilitiesPieChartProps> = ({
   };
 
   return (
-    <div className="rounded-lg bg-gradient-to-br from-red-50 to-red-100 h-[19rem] mt-3 p-4">
-      <h2 className="text-2xl font-bold text-red-800">Bills History</h2>
-      <div className="h-full w-full px-24">
+    <div>
+      <div className="h-full rounded-lg bg-gradient-to-br from-red-50 to-red-100 p-4">
+        <h2 className="text-2xl font-bold text-red-800">Bills History</h2>
+
         <Pie data={data} options={options} />
       </div>
     </div>

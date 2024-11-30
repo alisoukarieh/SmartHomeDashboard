@@ -44,14 +44,17 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
 
   useEffect(() => {
     if (isLargeScreen) {
-      const grid = GridStack.init({
-        column: 12,
-        float: true,
-        animate: true,
-        minRow: 5,
-        maxRow: 5,
-        staticGrid: !isEditing,
-      });
+      const grid1 = GridStack.init(
+        {
+          column: 12,
+          float: true,
+          animate: true,
+          minRow: 5,
+          maxRow: 5,
+          staticGrid: !isEditing,
+        },
+        ".grid-stack-page1"
+      );
     }
   }, [isEditing]);
 
@@ -59,7 +62,7 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
     <div className="px-4 md:px-12">
       {isLargeScreen ? (
         // GridStack layout for larger screens
-        <div className="grid-stack bg-white dark:bg-neutral-900 shadow-lg backdrop-blur-md bg-opacity-70 dark:bg-opacity-70 rounded-lg">
+        <div className="grid-stack grid-stack-page1 bg-white dark:bg-neutral-900 shadow-lg backdrop-blur-md bg-opacity-70 dark:bg-opacity-70 rounded-lg">
           <div
             className="grid-stack-item border-dark"
             gs-w="4"
@@ -100,7 +103,7 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
             gs-y="0"
             gs-no-resize="true"
           >
-            <div className="grid-stack-item-content">
+            <div className="grid-stack-item-content h-full">
               <TemperatureGaugeComponent />
             </div>
           </div>
@@ -112,7 +115,7 @@ export function Page1({ isEditing, isLargeScreen }: Page1Props) {
             gs-y="0"
             gs-no-resize="true"
           >
-            <div className="grid-stack-item-content">
+            <div className="grid-stack-item-content h-full">
               <HumidityGaugeComponent />
             </div>
           </div>

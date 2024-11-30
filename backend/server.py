@@ -33,6 +33,7 @@ async def add_bill(request: Request):
     bill_type = data.get("bill_type")
     amount = data.get("amount")
     date = data.get("date")
+    print(apartment_id, bill_type, amount, date)
     
     db, conn = connect_db()
     db.execute("INSERT INTO Bill (apartment_id, type, amount, consumed_value, date) VALUES (?, ?, ?, ?, ?);", 
@@ -140,14 +141,27 @@ async def turn_off_light():
     
 @app.get("/temp_hum")
 async def get_temp_hum():
-    url = f"http://{esp_ip}/Temp_Hum"
-    response = requests.get(url)
-    if response.status_code == 200:
+    try:
+        url = f"http://{esp_ip}/Temp_Hum"
+        response = requests.get(url, timeout=5)  # Add 5 second timeout
+        if response.status_code == 200:
+            db, conn = connect_db()
+            db.execute("Insert into RecordedData (device_id, value) VALUES (?, ?)", (1, response.json()['temperature']))
+            db.execute("Insert into RecordedData (device_id, value) VALUES (?, ?)", (2, response.json()['humidity']))
+            disconnect_db(conn)
+            return response.json()
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+        # If timeout or connection error, get latest readings from DB
         db, conn = connect_db()
-        db.execute("Insert into RecordedData (device_id, value) VALUES (?, ?)", (1, response.json()['temperature']))
-        db.execute("Insert into RecordedData (device_id, value) VALUES (?, ?)", (2, response.json()['humidity']))
+        db.execute("SELECT device_id, value FROM RecordedData WHERE device_id IN (1,2) GROUP BY device_id HAVING MAX(measurement_date)")
+        rows = db.fetchall()
+        latest_data = {}
+        for row in rows:
+            if row['device_id'] == 1:
+                latest_data['temperature'] = row['value']
+            elif row['device_id'] == 2:
+                latest_data['humidity'] = row['value']
         disconnect_db(conn)
-        return response.json()
-    else:
-        return {"status": "failed"}
+        return latest_data if latest_data else {"status": "failed"}
+    return {"status": "failed"}
 # curl -X GET "http://127.0.0.1:8000/turn_on_light"

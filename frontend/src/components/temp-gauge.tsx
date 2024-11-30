@@ -88,7 +88,7 @@ const TempGaugeComponent: FC = () => {
   };
 
   return (
-    <div className="w-full h-full bg-white rounded-lg flex flex-col items-center">
+    <div className="w-full bg-white rounded-lg flex flex-col items-center">
       <div className="px-4 w-full">
         <Doughnut data={data} options={options} />
       </div>

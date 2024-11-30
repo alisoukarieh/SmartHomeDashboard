@@ -18,7 +18,7 @@ const BillsList: React.FC<BillsListProps> = ({ bills }) => {
   };
 
   return (
-    <div className="p-4 h-[40rem] bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+    <div className="p-4 h-full w-full bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-green-800  ">
         Bills History
       </h2>

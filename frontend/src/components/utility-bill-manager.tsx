@@ -99,14 +99,14 @@ export function UtilityBillManagerComponent({
   };
 
   return (
-    <Card className="w-full max-w-xl h-[20rem] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800">
+    <Card className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 ">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-100">
+        <CardTitle className="text-2xl font-bold text-blue-800 ">
           Utility Bill Manager
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 mb-6">
+        <div className="grid gap-2 mb-6">
           <Select
             value={newBill.type}
             onValueChange={(value) => setNewBill({ ...newBill, type: value })}
