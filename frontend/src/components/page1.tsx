@@ -20,28 +20,6 @@ interface Page1Props {
 }
 
 export function Page1({ isEditing, isLargeScreen }: Page1Props) {
-  const [utilitiesData, setUtilitiesData] = useState({
-    Water: 0,
-    Electricity: 0,
-    Wifi: 0,
-  });
-
-  const fetchUtilitiesData = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/last_month_utilities`
-      );
-      setUtilitiesData(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching utilities data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUtilitiesData();
-  }, []);
-
   useEffect(() => {
     if (isLargeScreen) {
       const grid1 = GridStack.init(
