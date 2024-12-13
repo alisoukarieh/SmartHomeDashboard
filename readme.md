@@ -51,7 +51,7 @@ pip install -r requirements.txt
 Run the server:
 
 ```sh
-uvicorn main:app --reload
+fastapi run server.py
 ```
 
 ## Frontend Setup (Next.js)
