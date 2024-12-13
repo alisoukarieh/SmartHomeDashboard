@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 
 app = FastAPI()
-esp_ip = "192.168.1.21"
+esp_ip = "XXX.XXX.X.XX"
 
 app.add_middleware(
     CORSMiddleware,

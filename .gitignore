@@ -1,2 +1,3 @@
 venv
-apartment.db
+backend/__pycache__
+backend/.env
