@@ -13,9 +13,6 @@ import { Sidebar } from "@/components/sidebar";
 export default function Home() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(true);
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
@@ -28,15 +25,10 @@ export default function Home() {
     };
   }, [isLargeScreen]);
 
-  // const handleToggle = (newValue: boolean) => {
-  //   setIsEditing(newValue);
-  // };
-
   return (
     <div>
       <GlossyTopBarComponent />
       <div className="">
-        {/* <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} /> */}
         <PaginationComponent
           pages={[
             () => <Page1 isEditing={isEditing} isLargeScreen={isLargeScreen} />,
@@ -44,18 +36,6 @@ export default function Home() {
           ]}
           disableSwipe={isEditing}
         />
-        {/* {isLargeScreen && (
-          <>
-            <div className="absolute left-12">
-              <EditButton value={isEditing} onToggle={handleToggle} />
-            </div>
-            <div className="absolute right-12">
-              <button onClick={toggleSidebar}>
-                <AddButton />
-              </button>
-            </div>
-          </>
-        )} */}
       </div>
     </div>
   );

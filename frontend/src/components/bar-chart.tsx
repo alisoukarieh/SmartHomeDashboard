@@ -1,4 +1,4 @@
-// components/BarChart.tsx
+// chatgpt
 
 "use client";
 

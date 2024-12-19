@@ -8,6 +8,7 @@ import requests
 app = FastAPI()
 esp_ip = "XXX.XXX.X.XX"
 
+# Stack overflow 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
@@ -73,6 +74,7 @@ async def get_bills():
     disconnect_db(conn)
     return JSONResponse(content=bills)
 
+# chatgpt
 @app.get("/monthly_utilities")
 def get_monthly_utilities():
     db, conn = connect_db()
@@ -93,6 +95,7 @@ def get_monthly_utilities():
     disconnect_db(conn)
     return JSONResponse(content=monthly_data)
 
+#chatgpt
 @app.get("/recorded_data")
 async def get_recorded_data():
     db, conn = connect_db()

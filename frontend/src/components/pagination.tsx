@@ -1,3 +1,5 @@
+// Stack overflow
+
 import React, { useState, useRef, useEffect } from "react";
 
 interface PaginationProps {

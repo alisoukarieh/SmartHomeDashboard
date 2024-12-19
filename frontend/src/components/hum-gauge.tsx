@@ -59,6 +59,7 @@ const HumGaugeComponent: FC = () => {
     ],
   };
 
+  // stackoverflow
   const options: ChartOptions<"doughnut"> = {
     responsive: true,
     rotation: -90,
